@@ -1,6 +1,6 @@
 const passport = require("passport");
-
-module.exports = (app) => {
+// export this to use in index
+module.exports = app => {
   // when go the this url at the first time there is error go to url given at error and at the callbackURL above to config
   app.get(
     "/auth/google",
@@ -10,4 +10,13 @@ module.exports = (app) => {
   );
 
   app.get("/auth/google/callback", passport.authenticate("google"));
+  // loge out the current user
+  app.get("/api/logout", (req, res) => {
+    req.logout();
+    res.send('log out');
+  });
+  // test to see the loged in user
+  app.get("/api/current_user", (req, res) => {
+    res.send(req.user);
+  });
 };
