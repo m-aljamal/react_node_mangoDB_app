@@ -105,3 +105,38 @@ At this point we finish the aoth and could add another strategy like facebook wi
                 app.get("/api/logout", (req, res) => {
                     req.logout()
                 });
+
+ ************ Dev vs Prod Keys  ************
+ - create new database and new google api account for production 
+ 1. go to mLab and create new database and get the connection url 
+    mongodb://<dbuser>:<dbpassword>@ds161455.mlab.com:61455/emaily-production
+    and new database user     
+ 2. create new google account from: 
+        https://console.developers.google.com   
+        
+    in Authorized redirect URIs
+    we should put heroku url that we are going to deploy 
+    in comand line type heroku open  and use the url address add /auth/google/callback  at the end 
+3. after finish back to keys file make new file dev.js and move old keys to this new file. 
+in the keys.js file write code to figure wither we are in dev or production moode: 
+                        if (process.env.NODE_ENV === 'production'){
+                            // we are in production return the prod keys 
+                        module.exports = require('./prod')
+                        }else{
+                            // we are in dev return the keys fro dev 
+                            module.exports = require('./dev')
+                        }
+the prod.js file has keys for production should be commit  
+in prod.js add envirment vaeiabels: 
+        module.exports = {
+            googleClientID: process.env.GOOGLE_CLIENT_ID,
+            googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            mongoURI: process.env.MONGOURI,
+            cookieKey:  process.env.COOKIEKEY
+        };
+- to add the actual values of these variabels go to heroku site and to the projeact -> settings  
+-> config vars        
+           add key and value 
+           key is: GOOGLE_CLIENT_ID
+           value is: the string get from google 
+   
