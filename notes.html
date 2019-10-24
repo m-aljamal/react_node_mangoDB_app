@@ -1,0 +1,107 @@
+- npm init -y 
+- npm install --save express 
+- mkdir index.js   the root file
+- create server :      
+
+        const PORT = process.env.PORT || 3000
+
+        app.listen(PORT,() =>
+        console.log('start')
+        )
+
+- define engine in package json: 
+        "engines": {
+            "node": "8.1.1",
+            "npm": "5.0.3"
+        },
+
+            "scripts": {
+                "start": "node index.js"
+               },  
+               
+- create new file name .gitignore  and write inside it node_modules     this let git not commit node_moduls file 
+
+<!--  the above is the all config to deploy app in heroku  -->
+
+
+***** google OAuth with passport ********************
+         can use another stratige here I use google 
+- npm install --save passport passport-google-oauth20
+const passport = require('passport')
+const GoogleStrategy = require('passport-google-oauth20')
+
+see the config in index.js // passport setup
+
+
+// install nodemon  start server in devlope mood 
+ "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+
+    npm run dev
+
+
+- when login at the first time server back cookie or token to remmeber
+  the person so when asking info from server another time server know that cookie. 
+
+ - in the app we use  cookie based authentication that mean when user login to server we will send a header 
+ with the responce, the header is have set-cookie will be rendom token 'fdggd' the browser will save 
+ these token in memory and browser automaticly add this token to another requsts sent to server to know the user. 
+
+
+  **************** MongoDB setup *************************
+  1. go to https://mlab.com 
+  2. create new database 
+  3. after create database click on it => Users => add database user (here the users is how can have accses to database)
+  4. nom install --save mongoose 
+  5. in index.js: 
+       require mongoose 
+       mongoose.connect('mongodb://m.jamal:metal+158@ds251894.mlab.com:51894/emaily-dav')
+         //this address is from mlab site hide this key in another file 
+         // and <dbuser>:<dbpassword> edit these with user email and password 
+6. create new folder  models -> user that contains all classes used for mongoose   
+     // see that file for how to config mongoose 
+
+7. after finish from user model require in index    require('./models/User')                                     
+
+8. in passport file:
+        const mongoose = require('mongoose')
+        const User = mongoose.model('users')  // this means getting data from schema 
+        
+    after define strategy in call back: 
+        see the code there     
+  
+9. adding cookies to the app: 
+                passport.serializeUser((user, done) =>{
+                    done(null, user.id) // user.id is not the googleId it is mongoose how genreate that id 
+                
+                passport.deserializeUser((id, done) => {   // first argiment is the token we sent before to user browser here 
+                                                    // is user id 
+                // search for all record in database for user id 
+                User.findById(id).then(user => { // all query need promise 
+                    done(null, user)
+                })   
+                })  
+
+    now we need to enaple useign of cookies: 
+                    npm i --save cookie-session 
+        in index file: 
+                    const cookieSession = require('cookie-session')                            
+                    const passport = require('passport') 
+                     
+                     app.use(
+                        cookieSession({
+                            maxAge:  30 * 24 * 60 * 60 * 1000,   // how long cookie exists inside the browser before automaticly expired here we use 30 dayes 
+                            keys: [keys.cookieKey]
+                        })
+                )
+                
+                app.use(passport.initialize())
+                app.use(passport.session())
+
+At this point we finish the aoth and could add another strategy like facebook with same stips 
+
+- handling log out : 
+                app.get("/api/logout", (req, res) => {
+                    req.logout()
+                });
