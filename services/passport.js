@@ -35,7 +35,8 @@ passport.use(
     {
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
-      callbackURL: "/auth/google/callback" // where user redirect after sign in
+      callbackURL: "/auth/google/callback", // where user redirect after sign in
+      proxy: true
     },
     (accessToken, refreshToken, profile, done) => {
       // make serach inside collection to check if user alerdy has saved in database if not add him to database
